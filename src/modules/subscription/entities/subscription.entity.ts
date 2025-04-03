@@ -6,7 +6,7 @@ export class Subscription {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   plan: string; // Nome do plano de assinatura
 
   @Column({ type: 'date' })

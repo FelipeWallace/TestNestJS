@@ -11,12 +11,25 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll(search?: string) {
+    const query = this.userRepository.createQueryBuilder('user');
+
+    if (search) {
+      query.where('user.name ILIKE :search OR user.email ILIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+
+    return query.getMany();
   }
 
   async createUser(createUserDto: CreateUserDto) {
     const newUser = this.userRepository.create(createUserDto);
     return this.userRepository.save(newUser);
+  }
+
+  async delete(id: number): Promise<boolean> {
+    const result = await this.userRepository.delete(id);
+    return (result.affected ?? 0) > 0;
   }
 }
