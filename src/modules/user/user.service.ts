@@ -11,16 +11,38 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async findAll(search?: string) {
+  // async findAll(search?: string) {
+  //   const query = this.userRepository.createQueryBuilder('user');
+
+  //   if (search) {
+  //     query.where('user.name ILIKE :search OR user.email ILIKE :search', {
+  //       search: `%${search}%`,
+  //     });
+  //   }
+
+  //   return query.getMany();
+  // }
+
+  async findAll(page: number, limit: number, search?: string) {
+    const skip = (page - 1) * limit;
     const query = this.userRepository.createQueryBuilder('user');
 
+    // Busca por nome ou email
     if (search) {
       query.where('user.name ILIKE :search OR user.email ILIKE :search', {
         search: `%${search}%`,
       });
     }
 
-    return query.getMany();
+    // Paginação
+    const [data, total] = await query.skip(skip).take(limit).getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
   }
 
   async createUser(createUserDto: CreateUserDto) {

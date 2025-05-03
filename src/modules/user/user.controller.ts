@@ -16,9 +16,18 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // @Get()
+  // findAll(@Query('search') search?: string) {
+  //   return this.userService.findAll(search);
+  // }
+
   @Get()
-  findAll(@Query('search') search?: string) {
-    return this.userService.findAll(search);
+  async findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Query('search') search?: string,
+  ) {
+    return this.userService.findAll(+page, +limit, search);
   }
 
   @Post()
